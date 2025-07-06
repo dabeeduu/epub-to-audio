@@ -16,6 +16,12 @@ def extract_toc(toc: list[Any], title_map: dict):
             title_map[href_no_fragment] = item.title
 
 
+def clean_text(text):
+    text = text.replace("\xa0", " ")
+    text = text.replace("‘", "'").replace("’", "'").replace("“", '"').replace("”", '"')
+    return text
+
+
 def extract_text_from_epub(epub_path):
     book = epub.read_epub(epub_path)
     chapters = {}
@@ -40,14 +46,17 @@ def extract_text_from_epub(epub_path):
 
         paragraphs = []
         for p in soup.find_all("p"):
-            text = p.get_text(strip=True)
-            if text:
+            text = p.get_text()
+            if text.strip():
                 paragraphs.append(text)
 
         if not paragraphs:
             continue
 
-        chapters[title] = f"{title}\n\n{'\n\n'.join(paragraphs)}"
+        paragraph_string = "\n\n".join(paragraphs)
+        cleaned_paragraph = clean_text(paragraph_string)
+
+        chapters[title] = f"{title}\n\n{cleaned_paragraph}"
 
     return chapters
 
@@ -92,7 +101,9 @@ async def main():
             c for c in title if c.isalnum() or c in (" ", "_", "-")
         ).rstrip()
         file_name = os.path.join("output", f"{i}-{safe_title}.mp3")
-        task = convert_with_semaphore(semaphore, text, file_name, progress)
+        task = convert_with_semaphore(
+            semaphore, text, file_name, progress, voice="en-US-AvaMultilingualNeural"
+        )
         tasks.append(task)
 
     await asyncio.gather(*tasks)
@@ -101,14 +112,11 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
-# The idea :
-# 1. get epub file
-# 2. split based on chapter
-# 3. put into a list
-# 4. asynchronously parse it to mp3
-#
 # Improvement :
 # 1. create front end for GUI (maybe using react)
 # 2. choose the voice
 # 3. maybe even support pdf ?
 # 4. add loading bar
+# 5. compare the output if the tts is being done per sentences
+# 6. how to know whether this is a sentence or not
+# maybe if it start with ' or " it has to end first else .
