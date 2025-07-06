@@ -117,6 +117,3 @@ if __name__ == "__main__":
 # 2. choose the voice
 # 3. maybe even support pdf ?
 # 4. add loading bar
-# 5. compare the output if the tts is being done per sentences
-# 6. how to know whether this is a sentence or not
-# maybe if it start with ' or " it has to end first else .
