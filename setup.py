@@ -11,7 +11,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "epub-to-audio=cli:run",
+            "epub-to-audio=epub_to_audio.cli:run",
         ],
     },
 )

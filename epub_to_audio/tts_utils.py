@@ -17,5 +17,5 @@ async def convert_with_semaphore(
         await convert_text_to_audio(text, output_file, voice)
 
         duration = time.time() - start
-        progress.done += 1
-        print(f"Finished: {output_file} in {duration:.2f} seconds")
+        progress.update()
+        print(f"\nFinished: {output_file} in {duration:.2f} seconds")

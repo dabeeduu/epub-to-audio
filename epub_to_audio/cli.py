@@ -2,9 +2,9 @@ import argparse
 import asyncio
 import os
 
-from epub_utils import extract_text_from_epub
-from tts_utils import convert_with_semaphore
-from progress import Progress
+from .epub_utils import extract_text_from_epub
+from .tts_utils import convert_with_semaphore
+from .progress import Progress
 
 
 async def main(file, voice):
@@ -26,6 +26,8 @@ async def main(file, voice):
 
     await asyncio.gather(*tasks)
 
+    progress.done()
+
 
 def run():
     parser = argparse.ArgumentParser(
@@ -46,3 +48,8 @@ def run():
 
 if __name__ == "__main__":
     run()
+
+# improvement
+# Loading Bar
+# GUI
+# Selectable chapter to convert
