@@ -3,6 +3,7 @@ import ebooklib
 import edge_tts
 import asyncio
 import time
+import os
 from ebooklib import epub
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
@@ -37,13 +38,16 @@ def extract_text_from_epub(epub_path):
             if tag.get_text(strip=True) == title:
                 tag.decompose()
 
-        text = soup.get_text().strip()
-        if not text:
+        paragraphs = []
+        for p in soup.find_all("p"):
+            text = p.get_text(strip=True)
+            if text:
+                paragraphs.append(text)
+
+        if not paragraphs:
             continue
 
-        text = f"{title}\n\n{text}"
-
-        chapters[title] = text
+        chapters[title] = f"{title}\n\n{'\n\n'.join(paragraphs)}"
 
     return chapters
 
@@ -53,8 +57,14 @@ async def convert_text_to_audio(text, output_file, voice="en-GB-RyanNeural"):
     await communicate.save(output_file)
 
 
+class Progress:
+    def __init__(self, total):
+        self.total = total
+        self.done = 0
+
+
 async def convert_with_semaphore(
-    semaphore, text, output_file, voice="en-GB-RyanNeural"
+    semaphore, text, output_file, progress, voice="en-GB-RyanNeural"
 ):
     async with semaphore:
         start = time.time()
@@ -63,19 +73,26 @@ async def convert_with_semaphore(
         await convert_text_to_audio(text, output_file, voice)
 
         duration = time.time() - start
+        progress.done += 1
         print(f"Finished: {output_file} in {duration:.2f} seconds")
 
 
 async def main():
-    epub_path = "carl3.epub"
+    epub_path = "midnight.epub"
     chapters = extract_text_from_epub(epub_path)
 
+    os.makedirs("output", exist_ok=True)
+
     semaphore = asyncio.Semaphore(5)
+    progress = Progress(total=len(chapters))
 
     tasks = []
     for i, (title, text) in enumerate(chapters.items()):
-        file_name = f"{i}-{title}.mp3"
-        task = convert_with_semaphore(semaphore, text, file_name)
+        safe_title = "".join(
+            c for c in title if c.isalnum() or c in (" ", "_", "-")
+        ).rstrip()
+        file_name = os.path.join("output", f"{i}-{safe_title}.mp3")
+        task = convert_with_semaphore(semaphore, text, file_name, progress)
         tasks.append(task)
 
     await asyncio.gather(*tasks)
