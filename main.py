@@ -8,11 +8,6 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 
-async def convert_text_to_audio(text, output_file, voice="en-GB-RyanNeural"):
-    communicate = edge_tts.Communicate(text, voice)
-    await communicate.save(output_file)
-
-
 def extract_toc(toc: list[Any], title_map: dict):
     for item in toc:
         if isinstance(item, epub.Link):
@@ -53,38 +48,41 @@ def extract_text_from_epub(epub_path):
     return chapters
 
 
-def main():
+async def convert_text_to_audio(text, output_file, voice="en-GB-RyanNeural"):
+    communicate = edge_tts.Communicate(text, voice)
+    await communicate.save(output_file)
+
+
+async def convert_with_semaphore(
+    semaphore, text, output_file, voice="en-GB-RyanNeural"
+):
+    async with semaphore:
+        start = time.time()
+        print(f"start converting: {output_file}")
+
+        await convert_text_to_audio(text, output_file, voice)
+
+        duration = time.time() - start
+        print(f"Finished: {output_file} in {duration:.2f} seconds")
+
+
+async def main():
     epub_path = "carl3.epub"
-
-    start_time = time.time()
-
     chapters = extract_text_from_epub(epub_path)
 
-    for i, (title, body) in enumerate(chapters.items()):
-        print(f"--- {title} ---")
-        print(body[:500])
-        print()
-        if i == 10:
-            break
+    semaphore = asyncio.Semaphore(5)
 
-    output_audio = "sample_audio.mp3"
-    key_list = list(chapters.keys())
-    asyncio.run(
-        convert_text_to_audio(
-            chapters[key_list[10]][:500], output_audio, "en-US-AvaNeural"
-        )
-    )
-    # asyncio.run(convert_text_to_audio(chapters[10][:500], output_audio))
-    print(f"Done! Audio saved to {output_audio}")
-    #
-    # end_time = time.time()
-    # elapsed_time = end_time - start_time
-    #
-    # print(f"Extracted {len(chapters)} chapters in {elapsed_time:.2f} seconds.\n")
+    tasks = []
+    for i, (title, text) in enumerate(chapters.items()):
+        file_name = f"{i}-{title}.mp3"
+        task = convert_with_semaphore(semaphore, text, file_name)
+        tasks.append(task)
+
+    await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 
 # The idea :
 # 1. get epub file
@@ -96,3 +94,4 @@ if __name__ == "__main__":
 # 1. create front end for GUI (maybe using react)
 # 2. choose the voice
 # 3. maybe even support pdf ?
+# 4. add loading bar
