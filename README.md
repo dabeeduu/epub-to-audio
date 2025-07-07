@@ -1,60 +1,129 @@
 # epub-to-audio
+
 [![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/dabeeduu/epub-to-audio)
 
-A command-line tool to convert EPUB e-books into audio files, chapter by chapter, using Microsoft Edge's Text-to-Speech (TTS) service. This script extracts the text from each chapter of an EPUB file and generates a corresponding MP3 audio file.
+A fullstack application and CLI toolset to convert EPUB e-books into high-quality audio files — chapter by chapter — using Microsoft Edge's Text-to-Speech (TTS) service. Upload your EPUB, choose your preferred voice, and **download** ready-to-listen audio to enjoy anywhere.
 
-## Features
 
-*   **EPUB to Audio Conversion**: Converts the text content of EPUB files into spoken audio.
-*   **Chapter-by-Chapter**: Creates a separate MP3 file for each chapter, preserving the book's structure.
-*   **High-Quality TTS**: Utilizes `edge-tts` for natural-sounding voice synthesis.
-*   **Customizable Voice**: Allows you to select from a wide range of Edge TTS voices.
-*   **Concurrent Processing**: Processes multiple chapters simultaneously to speed up conversion.
-*   **Progress Tracking**: Displays a progress bar to monitor the conversion process.
+##  Features
 
-## Installation
+- **EPUB to Audio Conversion**: Seamlessly convert EPUB text content into spoken audio.
+- **Chapter-by-Chapter Output**: Generates separate MP3 files for each chapter, preserving the book’s structure.
+- **High-Quality Voices**: Uses `edge-tts` for natural, expressive voice synthesis.
+- **Customizable Voice Selection**: Choose from a wide variety of voices and accents supported by Edge TTS.
+- **Concurrent Processing**: Converts multiple chapters in parallel for faster results.
+- **Modern Web UI**: Built with React (TypeScript + Tailwind CSS), featuring drag-and-drop EPUB upload and progress tracking.
+- **Fast, Robust Backend**: Powered by FastAPI for high performance.
+- **Downloadable Audio**: Easily download generated MP3 files chapter by chapter.
 
-1.  Clone the repository to your local machine:
-    ```bash
-    git clone https://github.com/dabeeduu/epub-to-audio.git
-    ```
 
-2.  Navigate into the cloned directory:
-    ```bash
-    cd epub-to-audio
-    ```
+##  Installation
 
-3.  Install the package and its dependencies. It is recommended to do this within a virtual environment.
-    ```bash
-    pip install .
-    ```
+### Fullstack (Frontend + Backend)
 
-## Usage
+> ⚠️ **Important:** The `make run-all` and `start.sh` scripts **do not install dependencies**. You must install them manually before running.
 
-The script is run from the command line. It will create an `output` directory in your current working directory to store the generated MP3 files.
+#### Install dependencies
+Clone the repository:
+
+```bash
+git clone https://github.com/dabeeduu/epub-to-audio.git
+cd epub_to_audio
+make build-and-run-all
+```
+
+
+
+#### Start the application
+
+From the project root:
+
+```bash
+make run-all
+```
+
+or
+
+```bash
+./start.sh 
+```
+
+This will:
+
+- Start the FastAPI backend (default: `http://0.0.0.0:8000`)
+- Start the React frontend (default: `http://localhost:3000`)
+
+---
+
+### CLI Tools Only
+
+Clone the repository:
+
+```bash
+git clone https://github.com/dabeeduu/epub-to-audio.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd epub-to-audio
+```
+
+Install the package (preferably in a virtual environment):
+
+```bash
+pip install .
+```
+
+
+## Usage (CLI)
+
+The CLI creates an `output` directory in your current working directory, storing the generated MP3 files.
 
 ### Basic Conversion
-
-To convert an EPUB file using the default voice (`en-US-AvaMultilingualNeural`), use the `--file` argument:
 
 ```bash
 epub-to-audio --file /path/to/your/ebook.epub
 ```
 
-### Specifying a Different Voice
+Uses the default voice: `en-US-AvaMultilingualNeural`.
 
-You can specify a different voice using the `--voice` argument.
+
+
+### Use a Different Voice
 
 ```bash
 epub-to-audio --file /path/to/your/ebook.epub --voice en-GB-RyanNeural
 ```
 
-To see a full list of available voices that you can use, run the following `edge-tts` command:
+List all available voices:
 
 ```bash
 edge-tts --list-voices
 ```
 
+## Frontend
+
+The web interface supports:
+
+- Drag-and-drop EPUB upload
+- **Downloadable audio files** after conversion
+-  Progress bar during conversion (planned)
+- Voice selection (planned)
+
+
 ## License
 
-This project is licensed under the GNU General Public License v3.0. See the `LICENSE` file for details.
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
+
+
+## Acknowledgements
+
+- [edge-tts](https://github.com/rany2/edge-tts) for the TTS engine.
+- FastAPI and React communities for the modern, robust stack.
+
+
+## Contributing
+
+Contributions are welcome! Please open issues or submit pull requests.
+
