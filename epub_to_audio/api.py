@@ -6,7 +6,7 @@ import shutil
 import os
 import zipfile
 
-from .converter import convert_epub_to_mp3
+from converter import convert_epub_to_mp3
 
 app = FastAPI()
 

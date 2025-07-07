@@ -2,9 +2,9 @@ import os
 import asyncio
 import uuid
 
-from .epub_utils import extract_text_from_epub
-from .tts_utils import convert_with_semaphore
-from .progress import Progress
+from epub_utils import extract_text_from_epub
+from tts_utils import convert_with_semaphore
+from progress import Progress
 
 
 async def convert_epub_to_mp3(epub_path, voice="en-US-AvaMultilingualNeural"):
