@@ -10,6 +10,9 @@ BACKEND_DIR=epub_to_audio
 build-frontend:
 	cd ${FRONTEND_DIR} && npm install && npm run build
 
+build-backend:
+	cd ${BACKEND_DIR} && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt
+
 # Start backend only
 run-backend:
 	cd ${BACKEND_DIR} && uvicorn epub_to_audio.api:app --host 0.0.0.0 --port 8000 --workers 4
@@ -24,5 +27,5 @@ run-all:
 	cd ${FRONTEND_DIR} && npx serve -s dist -l 3000
 
 # Run both and rebuild frontend
-build-and-run-all: build-frontend run-all
+build-and-run-all: build-frontend build-backend run-all
 
